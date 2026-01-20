@@ -171,35 +171,201 @@ body {
     opacity: 0;
 }
 
+/* Guide Silhouette Container */
 .guide-silhouette {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 15px;
+    transform-origin: center center;
+}
+
+/* Each Person */
+.person {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: center center;
+    transition: none;
+}
+
+.person.hidden {
+    display: none;
+}
+
+.person-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    pointer-events: none;
+    transform-origin: center center;
+    transition: transform 0.1s ease;
+}
+
+/* Person Edit Mode */
+.person.editing {
+    cursor: move;
+    pointer-events: auto;
+}
+
+.person.editing .person-content {
+    outline: 2px dashed rgba(52, 199, 89, 0.8);
+    outline-offset: 5px;
+}
+
+/* Person Edit Button */
+.person-edit-btn {
+    position: absolute;
+    top: -35px;
+    right: -10px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+    pointer-events: auto;
+    z-index: 10;
+    opacity: 0.8;
+}
+
+.person:hover .person-edit-btn {
+    opacity: 1;
+}
+
+.person-edit-btn:active {
+    transform: scale(0.9);
+}
+
+.person.editing .person-edit-btn {
+    background: #34c759;
+    color: #fff;
+    opacity: 1;
+}
+
+/* 커플/단체에서만 person 편집 버튼 표시 */
+.guide-frame[data-guide="portrait"] .person-edit-btn {
+    display: none;
+}
+
+/* 전체 가이드 편집 모드일 때는 person 편집 버튼 숨기기 */
+.guide-frame.editing .person-edit-btn {
+    display: none !important;
+}
+
+/* Person Resize Handles */
+.person-resize-handle {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border: 2px solid #34c759;
+    border-radius: 50%;
+    z-index: 11;
+    pointer-events: auto;
+}
+
+.person-resize-handle.hidden {
+    display: none;
+}
+
+.person-resize-tl {
+    top: -8px;
+    left: -8px;
+    cursor: nwse-resize;
+}
+
+.person-resize-tr {
+    top: -8px;
+    right: -8px;
+    cursor: nesw-resize;
+}
+
+.person-resize-bl {
+    bottom: -8px;
+    left: -8px;
+    cursor: nesw-resize;
+}
+
+.person-resize-br {
+    bottom: -8px;
+    right: -8px;
+    cursor: nwse-resize;
+}
+
+/* Person Head */
+.person-head {
+    width: 65px;
+    height: 65px;
+    border: 3px solid rgba(255,255,255,0.6);
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), transparent 70%);
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.2),
+        inset 0 2px 4px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+/* Person Body */
+.person-body {
+    width: 110px;
+    height: 190px;
+    border: 3px solid rgba(255,255,255,0.6);
+    border-radius: 55px 55px 40px 40px;
+    background:
+        radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.08), transparent 60%),
+        rgba(255,255,255,0.03);
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.2),
+        inset 0 10px 20px rgba(0,0,0,0.05);
+    flex-shrink: 0;
+}
+
+/* Portrait (1 person) */
+.guide-frame[data-guide="portrait"] .guide-silhouette {
     width: 140px;
     height: 280px;
-    border: 2px dashed rgba(255,255,255,0.4);
-    border-radius: 70px 70px 50px 50px;
-    position: relative;
 }
 
-.guide-silhouette::before {
-    content: '';
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 50px;
-    border: 2px dashed rgba(255,255,255,0.4);
-    border-radius: 50%;
+.guide-frame[data-guide="portrait"] .person-2,
+.guide-frame[data-guide="portrait"] .person-3 {
+    display: none !important;
 }
 
-/* Guide Variations */
+/* Couple (2 people) */
 .guide-frame[data-guide="couple"] .guide-silhouette {
-    width: 200px;
+    width: 260px;
+    height: 280px;
 }
 
+.guide-frame[data-guide="couple"] .person-1,
+.guide-frame[data-guide="couple"] .person-2 {
+    display: flex !important;
+}
+
+.guide-frame[data-guide="couple"] .person-3 {
+    display: none !important;
+}
+
+/* Group (3 people) */
 .guide-frame[data-guide="group"] .guide-silhouette {
-    width: 280px;
-    height: 240px;
-    border-radius: 20px;
+    width: 390px;
+    height: 280px;
+}
+
+.guide-frame[data-guide="group"] .person-1,
+.guide-frame[data-guide="group"] .person-2,
+.guide-frame[data-guide="group"] .person-3 {
+    display: flex !important;
 }
 
 /* Alignment Feedback */
