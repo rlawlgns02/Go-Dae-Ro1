@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.svg">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23000' width='100' height='100' rx='20'/><circle cx='50' cy='50' r='25' fill='none' stroke='%23fff' stroke-width='4'/><circle cx='50' cy='50' r='8' fill='%23fff'/></svg>">
+    <title>GO대로</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- 스플래시 화면 -->
+        <div id="splash-screen" class="screen active">
+            <div class="splash-content">
+                <h1 class="logo">GO대로</h1>
+                <p class="tagline">가이드대로, 완벽하게</p>
+                <button id="start-btn" class="btn-primary">시작하기</button>
+            </div>
+        </div>
+
+        <!-- 메인 카메라 화면 -->
+        <div id="camera-screen" class="screen">
+            <!-- 카메라 뷰 -->
+            <div class="camera-container">
+                <video id="camera-feed" autoplay playsinline muted></video>
+                <canvas id="overlay-canvas"></canvas>
+                <canvas id="pose-canvas"></canvas>
+
+                <!-- 가이드 프레임 -->
+                <div id="guide-frame" class="guide-frame hidden">
+                    <div class="guide-silhouette"></div>
+                </div>
+
+                <!-- 정렬 피드백 -->
+                <div id="alignment-feedback" class="alignment-feedback">
+                    <span class="feedback-text">가이드에 맞춰주세요</span>
+                </div>
+            </div>
+
+            <!-- 상단 바 -->
+            <header class="top-bar">
+                <button id="close-btn" class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <div class="top-center">
+                    <button id="flash-btn" class="icon-btn" data-flash="off">
+                        <svg class="flash-icon-off" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            <line x1="2" y1="2" x2="22" y2="22" stroke-width="2.5"></line>
+                        </svg>
+                        <svg class="flash-icon-on hidden" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                    </button>
+                    <button id="ratio-btn" class="icon-btn">
+                        <span class="ratio-label">3:4</span>
+                    </button>
+                </div>
+                <button id="settings-btn" class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+                    </svg>
+                </button>
+            </header>
+
+            <!-- 비율 선택 패널 -->
+            <div id="ratio-panel" class="ratio-panel hidden">
+                <button class="ratio-option" data-ratio="1:1">1:1</button>
+                <button class="ratio-option active" data-ratio="3:4">3:4</button>
+                <button class="ratio-option" data-ratio="9:16">9:16</button>
+                <button class="ratio-option" data-ratio="full">Full</button>
+            </div>
+
+            <!-- 비율 마스크 오버레이 -->
+            <div id="ratio-mask" class="ratio-mask"></div>
+
+            <!-- 하단 컨트롤 -->
+            <footer class="bottom-controls">
+                <!-- 가이드 선택 -->
+                <div class="guide-selector">
+                    <button class="guide-option" data-guide="none">
+                        <span class="guide-icon">○</span>
+                        <span class="guide-label">없음</span>
+                    </button>
+                    <button class="guide-option" data-guide="portrait">
+                        <span class="guide-icon">👤</span>
+                        <span class="guide-label">인물</span>
+                    </button>
+                    <button class="guide-option" data-guide="couple">
+                        <span class="guide-icon">👥</span>
+                        <span class="guide-label">커플</span>
+                    </button>
+                    <button class="guide-option" data-guide="group">
+                        <span class="guide-icon">👨‍👩‍👧</span>
+                        <span class="guide-label">단체</span>
+                    </button>
+                </div>
+
+                <!-- 촬영 버튼 영역 -->
+                <div class="capture-area">
+                    <button id="gallery-btn" class="side-btn">
+                        <div class="gallery-preview"></div>
+                    </button>
+                    <button id="capture-btn" class="capture-btn">
+                        <div class="capture-btn-inner"></div>
+                    </button>
+                    <button id="switch-camera-btn" class="side-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M4 8V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"></path>
+                            <polyline points="12 19 12 12"></polyline>
+                            <polyline points="9 15 12 12 15 15"></polyline>
+                            <polyline points="12 5 12 12"></polyline>
+                            <polyline points="15 9 12 12 9 9"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 타이머 옵션 -->
+                <div class="timer-selector">
+                    <button class="timer-option active" data-timer="0">OFF</button>
+                    <button class="timer-option" data-timer="3">3s</button>
+                    <button class="timer-option" data-timer="5">5s</button>
+                    <button class="timer-option" data-timer="10">10s</button>
+                </div>
+            </footer>
+
+            <!-- 타이머 카운트다운 -->
+            <div id="timer-countdown" class="timer-countdown hidden">
+                <span class="countdown-number">3</span>
+            </div>
+        </div>
+
+        <!-- 프리뷰 화면 -->
+        <div id="preview-screen" class="screen">
+            <div class="preview-container">
+                <img id="preview-image" src="" alt="촬영된 사진">
+            </div>
+            <header class="top-bar">
+                <button id="preview-close-btn" class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </header>
+            <footer class="preview-controls">
+                <button id="retake-btn" class="text-btn">다시 찍기</button>
+                <button id="save-btn" class="btn-primary">저장</button>
+            </footer>
+        </div>
+
+        <!-- 갤러리 화면 -->
+        <div id="gallery-screen" class="screen">
+            <header class="gallery-header">
+                <button id="gallery-close-btn" class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <h2>갤러리</h2>
+                <div style="width: 44px;"></div>
+            </header>
+            <div id="gallery-grid" class="gallery-grid">
+                <!-- 동적으로 채워짐 -->
+            </div>
+            <div id="gallery-empty" class="gallery-empty">
+                <p>아직 촬영한 사진이 없습니다</p>
+            </div>
+        </div>
+
+        <!-- 설정 패널 -->
+        <div id="settings-panel" class="settings-panel hidden">
+            <div class="settings-header">
+                <h3>설정</h3>
+                <button id="settings-close-btn" class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <span class="setting-label">포즈 감지</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="pose-detection-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">그리드 표시</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="grid-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">수평계</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="level-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">촬영음</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="sound-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 그리드 오버레이 -->
+        <div id="grid-overlay" class="grid-overlay hidden">
+            <div class="grid-line horizontal" style="top: 33.33%"></div>
+            <div class="grid-line horizontal" style="top: 66.66%"></div>
+            <div class="grid-line vertical" style="left: 33.33%"></div>
+            <div class="grid-line vertical" style="left: 66.66%"></div>
+        </div>
+
+        <!-- 수평계 -->
+        <div id="level-indicator" class="level-indicator hidden">
+            <div class="level-line"></div>
+            <div class="level-bubble"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="app.js"></script>
+</body>
+</html>
