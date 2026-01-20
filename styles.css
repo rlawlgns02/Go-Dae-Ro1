@@ -891,3 +891,305 @@ body {
 #flash-btn {
     position: relative;
 }
+
+/* Guide Edit Mode */
+.guide-frame {
+    cursor: default;
+    touch-action: none;
+}
+
+.guide-frame.editing {
+    cursor: move;
+}
+
+.guide-frame.editing .guide-silhouette {
+    border-color: rgba(52, 199, 89, 0.8);
+    border-style: solid;
+}
+
+.edit-guide-btn {
+    position: absolute;
+    top: -40px;
+    right: -10px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.edit-guide-btn:active {
+    transform: scale(0.9);
+}
+
+.guide-frame.editing .edit-guide-btn {
+    background: #34c759;
+    color: #fff;
+}
+
+/* Resize Handles */
+.resize-handle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border: 2px solid #34c759;
+    border-radius: 50%;
+    z-index: 10;
+}
+
+.resize-handle.hidden {
+    display: none;
+}
+
+.resize-handle-tl {
+    top: -10px;
+    left: -10px;
+    cursor: nwse-resize;
+}
+
+.resize-handle-tr {
+    top: -10px;
+    right: -10px;
+    cursor: nesw-resize;
+}
+
+.resize-handle-bl {
+    bottom: -10px;
+    left: -10px;
+    cursor: nesw-resize;
+}
+
+.resize-handle-br {
+    bottom: -10px;
+    right: -10px;
+    cursor: nwse-resize;
+}
+
+/* Guide Edit Toolbar */
+.guide-edit-toolbar {
+    position: absolute;
+    bottom: calc(env(safe-area-inset-bottom, 16px) + 200px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 8px 12px;
+    border-radius: 24px;
+    z-index: 20;
+}
+
+.guide-edit-toolbar.hidden {
+    display: none;
+}
+
+.guide-edit-toolbar button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+}
+
+.guide-edit-toolbar button:active {
+    background: rgba(255,255,255,0.1);
+}
+
+.guide-edit-toolbar button.primary {
+    background: #34c759;
+}
+
+/* Landscape Mode */
+@media (orientation: landscape) {
+    .top-bar {
+        padding-left: calc(env(safe-area-inset-left, 8px) + 8px);
+        padding-right: calc(env(safe-area-inset-right, 8px) + 8px);
+    }
+
+    .bottom-controls {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        left: auto;
+        width: auto;
+        padding: 16px;
+        padding-right: calc(env(safe-area-inset-right, 16px) + 16px);
+        flex-direction: column;
+        justify-content: center;
+        background: linear-gradient(270deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+    }
+
+    .guide-selector {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .guide-option {
+        padding: 6px 12px;
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .guide-icon {
+        font-size: 16px;
+    }
+
+    .guide-label {
+        font-size: 11px;
+    }
+
+    .capture-area {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .capture-btn {
+        width: 64px;
+        height: 64px;
+    }
+
+    .capture-btn-inner {
+        width: 50px;
+        height: 50px;
+    }
+
+    .timer-selector {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .timer-option {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .ratio-panel {
+        top: 50%;
+        left: calc(env(safe-area-inset-left, 12px) + 60px);
+        transform: translateY(-50%);
+        flex-direction: column;
+    }
+
+    .ratio-panel.hidden {
+        transform: translateY(-50%) translateX(-10px);
+    }
+
+    .settings-panel {
+        width: 300px;
+        max-width: 50%;
+    }
+
+    .preview-controls {
+        flex-direction: column;
+        right: 0;
+        top: 50%;
+        bottom: auto;
+        left: auto;
+        transform: translateY(-50%);
+        padding-right: calc(env(safe-area-inset-right, 20px) + 20px);
+        background: none;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Grid Overlay - Positioned within ratio area */
+.grid-overlay {
+    position: absolute;
+    pointer-events: none;
+    z-index: 5;
+    top: var(--grid-top, 0);
+    left: var(--grid-left, 0);
+    right: var(--grid-right, 0);
+    bottom: var(--grid-bottom, 0);
+}
+
+.grid-overlay.hidden {
+    display: none;
+}
+
+/* Perfect Alignment Feedback */
+.guide-frame.perfect .guide-silhouette {
+    border-color: #34c759 !important;
+    border-style: solid !important;
+    box-shadow: 0 0 30px rgba(52, 199, 89, 0.5);
+    animation: perfectPulse 1s ease-in-out infinite;
+}
+
+@keyframes perfectPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(52, 199, 89, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(52, 199, 89, 0.7); }
+}
+
+.capture-btn.ready {
+    animation: captureReady 0.8s ease-in-out infinite;
+}
+
+.capture-btn.ready .capture-btn-inner {
+    background: #34c759;
+}
+
+@keyframes captureReady {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+/* Ready to shoot indicator */
+.shoot-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.shoot-indicator.visible {
+    opacity: 1;
+}
+
+.shoot-indicator-ring {
+    width: 120px;
+    height: 120px;
+    border: 4px solid #34c759;
+    border-radius: 50%;
+    animation: ringPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+.shoot-indicator-text {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #34c759;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
